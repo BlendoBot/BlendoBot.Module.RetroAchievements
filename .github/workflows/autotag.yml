@@ -1,0 +1,40 @@
+name: Auto-tag
+on:
+  push:
+    branches:
+      - master
+jobs:
+  autotag:
+    name: Auto-tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Compute next tag name
+        id: compute_tag
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $lastTag = $(git tag --sort=version:refname | Select -Last 1)
+          if ([string]::IsNullOrEmpty($lastTag)) {
+            $newTag = "1.0.0-pre.1"
+          } else {
+            $prefixTag = $($lastTag.Split('.') | Select-Object -SkipLast 1) -join '.'
+            $lastTerm = $lastTag.Split('.')[-1]
+            $intendedLastTerm = [int]$lastTerm + 1
+            if ($lastTag -match "-pre") {
+              $newTag = $prefixTag + "." + [string]$intendedLastTerm
+            } else {
+              $newTag = $prefixTag + "." + [string]$intendedLastTerm + "-pre.1"
+            }
+          }
+          Write-Output "::set-output name=tag_name::$newTag"
+        
+      - name: Auto-tag repo
+        uses: tvdias/github-tagger@v0.0.1
+        with:
+          repo-token: ${{secrets.GIT_TOKEN}}
+          tag: "${{steps.compute_tag.outputs.tag_name}}"

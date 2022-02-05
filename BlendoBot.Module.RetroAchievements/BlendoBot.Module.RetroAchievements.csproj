@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Authors>Biendeo</Authors>
+    <Company>BlendoBot</Company>
+    <PackageId>BlendoBot.Module.RetroAchievements</PackageId>
+    <Version>1.0.0</Version>
+    <RepositoryUrl>https://github.com/BlendoBot/BlendoBot.Module.RetroAchievements</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/BlendoBot/BlendoBot.Module.RetroAchievements</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>discord;bot;module</PackageTags>
+    <Description>Provides commands to view details about RetroAchievements.</Description>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BlendoBot.Core" Version="1.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
+    <PackageReference Include="MinVer" Version="2.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,30 @@
+name: Publish to NuGet
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          source-url: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{ github.token }}
+
+      - name: Publish NuGet Package
+        id: publish_nuget
+        shell: pwsh
+        run: |
+          dotnet restore
+          dotnet pack --configuration Release
+          dotnet nuget list source
+          (Get-ChildItem -Recurse -Filter "*.nupkg")[0].FullName
+          dotnet nuget push ((Get-ChildItem -Recurse -Filter "*.nupkg")[0].FullName) --api-key "${{ github.token }}" --source "github.blendobot"
