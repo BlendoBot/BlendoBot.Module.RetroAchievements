@@ -18,17 +18,21 @@ jobs:
         shell: pwsh
         continue-on-error: true
         run: |
-          $lastTag = $(git tag --sort=version:refname | Select -Last 1)
+          $versions = $(git tag --sort=version:refname)
+          $lastTag = $($versions | Select -Last 1)
           if ([string]::IsNullOrEmpty($lastTag)) {
             $newTag = "1.0.0-pre.1"
           } else {
-            $prefixTag = $($lastTag.Split('.') | Select-Object -SkipLast 1) -join '.'
-            $lastTerm = $lastTag.Split('.')[-1]
-            $intendedLastTerm = [int]$lastTerm + 1
+            $nonPreVersion = $($lastTag.Split('.') | Select-Object -First 3) -join '.' -replace ".pre", ""
+            if ($versions -contains $nonPreVersion) {
+              $lastTag = $nonPreVersion
+            }
+            $stationaryVersion = $($lastTag.Split('.') | Select-Object -SkipLast 1) -join '.'
+            $lastDigit = ([int]$lastTag.Split('.')[-1]) + 1
             if ($lastTag -match "-pre") {
-              $newTag = $prefixTag + "." + [string]$intendedLastTerm
+              $newTag = $stationaryVersion + "." + [string]$lastDigit
             } else {
-              $newTag = $prefixTag + "." + [string]$intendedLastTerm + "-pre.1"
+              $newTag = $stationaryVersion + "." + [string]$lastDigit + "-pre.1"
             }
           }
           Write-Output "::set-output name=tag_name::$newTag"
